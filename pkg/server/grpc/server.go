@@ -5,9 +5,11 @@ import (
 	"net"
 
 	chatpb "github.com/tjons/text-to-trade/pkg/api/chat"
+	userpb "github.com/tjons/text-to-trade/pkg/api/user"
 	watchlistpb "github.com/tjons/text-to-trade/pkg/api/watchlist"
 	"github.com/tjons/text-to-trade/pkg/model"
 	"github.com/tjons/text-to-trade/pkg/server/chat"
+	"github.com/tjons/text-to-trade/pkg/server/user"
 	"github.com/tjons/text-to-trade/pkg/server/watchlist"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
@@ -34,6 +36,7 @@ func Run(ctx context.Context, network, address string) error {
 	s := grpc.NewServer()
 	watchlistpb.RegisterWatchlistServiceServer(s, watchlist.NewWatchlistServer(db))
 	chatpb.RegisterChatServer(s, chat.NewChatServer(db))
+	userpb.RegisterUserServiceServer(s, user.NewUserService(db))
 	// TODO: register services here
 
 	go func() {

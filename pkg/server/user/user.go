@@ -106,11 +106,16 @@ func (s *UserService) OnboardFlow(ctx context.Context, req *userpb.UserFlowReque
 		response.Message = "Choose Risk Level"
 		response.Options = []string{userpb.RiskLevel_LOW.String(), userpb.RiskLevel_HIGH.String()}
 	case userpb.Step_RISK:
-		risk, ok := userpb.RiskLevel_value[req.Response]
+		_, ok := userpb.RiskLevel_value[req.Response]
 		if !ok {
 			return nil, errors.New("invalid risk level")
 		}
-		user.Risk = model.RiskLevel(risk)
+		user.Risk = model.RiskLevel(req.Response)
+
+		if err := s.db.Save(user).Error; err != nil {
+			return nil, err
+		}
+
 		return s.sendWelcomeMessage(user)
 	default:
 		if user.Onboarded {

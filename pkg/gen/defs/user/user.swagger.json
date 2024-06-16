@@ -51,38 +51,6 @@
         ]
       }
     },
-    "/v1/user/onboard/flow": {
-      "post": {
-        "operationId": "UserService_OnboardFlow",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/userUserFlowResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/userUserFlowRequest"
-            }
-          }
-        ],
-        "tags": [
-          "UserService"
-        ]
-      }
-    },
     "/v1/user/{internalId}": {
       "get": {
         "operationId": "UserService_GetUser",
@@ -170,9 +138,59 @@
           "UserService"
         ]
       }
+    },
+    "/v1/user/{internalId}/onboard/flow": {
+      "post": {
+        "operationId": "UserService_OnboardFlow",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/userUserFlowResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "internalId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserServiceOnboardFlowBody"
+            }
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
     }
   },
   "definitions": {
+    "UserServiceOnboardFlowBody": {
+      "type": "object",
+      "properties": {
+        "currentStep": {
+          "$ref": "#/definitions/userStep"
+        },
+        "response": {
+          "type": "string"
+        }
+      }
+    },
     "protobufAny": {
       "type": "object",
       "properties": {
@@ -262,21 +280,6 @@
           "$ref": "#/definitions/userAllocation"
         },
         "firebaseUid": {
-          "type": "string"
-        }
-      }
-    },
-    "userUserFlowRequest": {
-      "type": "object",
-      "properties": {
-        "internalId": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "currentStep": {
-          "$ref": "#/definitions/userStep"
-        },
-        "response": {
           "type": "string"
         }
       }

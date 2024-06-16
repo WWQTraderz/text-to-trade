@@ -37,16 +37,28 @@ service WatchlistService {
             get: "/users/{user_id}/watchlist"
             response_body: "watchlist"
         };
+        
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get a watchlist by id for a user"
+        };
     };
     rpc ListWatchlists(WatchlistRequest) returns (WatchlistListResponse);
     rpc CreateWatchlist(Watchlist) returns (WatchlistResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/watchlist"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Create a new watchlist"
+        };
     };
     rpc UpdateWatchlist(Watchlist) returns (WatchlistResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/watchlist"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Update a user's watchlist"
         };
     };
 }

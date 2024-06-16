@@ -10,6 +10,7 @@ import (
 
 	gwruntime "github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/tjons/text-to-trade/pkg/api/chat"
+	"github.com/tjons/text-to-trade/pkg/api/user"
 	"github.com/tjons/text-to-trade/pkg/api/watchlist"
 	grpc_helpers "github.com/tjons/text-to-trade/pkg/grpc"
 	_ "google.golang.org/genproto/googleapis/rpc/errdetails"
@@ -23,6 +24,7 @@ func newGateway(ctx context.Context, conn *grpc.ClientConn, opts []gwruntime.Ser
 	for _, f := range []func(context.Context, *gwruntime.ServeMux, *grpc.ClientConn) error{
 		watchlist.RegisterWatchlistServiceHandler,
 		chat.RegisterChatHandler,
+		user.RegisterUserServiceHandler,
 	} {
 		if err := f(ctx, mux, conn); err != nil {
 			return nil, err

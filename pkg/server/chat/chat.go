@@ -24,50 +24,37 @@ func NewChatServer(db *gorm.DB) chat.ChatServer {
 	return &chatHandler{db: db}
 }
 
-func (s *chatHandler) SendChatMessage(ctx context.Context, req *chat.Question) (*chat.Answer, error) {
+func (s *chatHandler) SendMessage(ctx context.Context, req *chat.Question) (*chat.Answer, error) {
 	g, err := ai.Gemini(ctx)
 	if err != nil {
 		log.Println(err)
 		return nil, err
 	}
 
-	aiModel := g.GenerativeModel("gemini-1.0-pro")
+	aiModel := g.GenerativeModel("gemini-1.5-flash-001")
 	session := aiModel.StartChat()
-	wakeupResponse, err := session.SendMessage(ctx, genai.Text(
-		`You are an AI chatbot. 
-		You are here to help me convert user text into API actions. 
-		I will provide you with an OpenAPI spec and a user's text.
-		You should respond with the appropriate API route, HTTP method, and HTTP body formatted as JSON like this:
-		{
-			"route": "$ROUTE",
-			"method": "$METHOD",
-			"body": "$BODY"
-		}
-		Do NOT include any code formatting or comments in your response. Just return the response as JSON.
-		If you understand these instructions, please respond with "ack".`,
-	))
-	if err != nil {
-		log.Printf("Error waking up chatbot: %v", err)
-		return nil, err
-	}
-
-	wakeupResponseText, ok := wakeupResponse.Candidates[0].Content.Parts[0].(genai.Text)
-	if !ok {
-		log.Printf("Unexpected response type")
-		return nil, fmt.Errorf("Unexpected response type")
-	}
-
-	if !strings.Contains(string(wakeupResponseText), "ack") {
-		log.Printf("Chatbot failed to wake up: %v", wakeupResponse.Candidates[0].Content.Parts[0].(genai.Text))
-		return nil, fmt.Errorf("Chatbot failed to wake up")
-	}
 
 	actualResponse, err := session.SendMessage(ctx, genai.Text(fmt.Sprintf(
-		`
-		OpenAPI spec: "%s"
+		`Consider the following OpenAPI schema:
 
-
-		User's text: "%s".`,
+		%s
+		
+		You are an API schema expert. 
+			You are here to help me convert user text into API actions. 
+			I will provide you with an OpenAPI spec and a user's text describing an action they would like to take.
+			There is a route in the OpenAPI spec that matches the user's text.
+			You should respond with the best API route, HTTP method, and HTTP body formatted as JSON like this:
+			{
+				"route": "$ROUTE",
+				"method": "$METHOD",
+				"body": "$BODY"
+			}
+			Do NOT include any code formatting or comments in your response. Just return the response as JSON.
+			BE SURE to consider all available routes in the OpenAPI spec and find the BEST match for the user's text.
+		
+		Here is the user's text: 
+		 "%s"
+		`,
 		gen.WatchlistSwagger, req.Message,
 	)))
 	if err != nil {
@@ -107,7 +94,7 @@ func (s *chatHandler) SendAdviceMessage(ctx context.Context, req *chat.Question)
 		return nil, err
 	}
 
-	aiModel := g.GenerativeModel("gemini-1.0-pro")
+	aiModel := g.GenerativeModel("gemini-1.5-flash")
 	session := aiModel.StartChat()
 	wakeupResponse, err := session.SendMessage(ctx, genai.Text(
 		`You are an expert investment advisor, with a strong track record of managing risk, outperforming the market, and understanding your clients.
@@ -125,7 +112,7 @@ func (s *chatHandler) SendAdviceMessage(ctx context.Context, req *chat.Question)
 		return nil, fmt.Errorf("Unexpected response type")
 	}
 
-	if strings.Contains(string(wakeupResponseText), "ack") {
+	if !strings.Contains(string(wakeupResponseText), "ack") {
 		log.Printf("Chatbot failed to wake up: %v", wakeupResponse.Candidates[0].Content.Parts[0].(genai.Text))
 		return nil, fmt.Errorf("Chatbot failed to wake up")
 	}
@@ -133,6 +120,8 @@ func (s *chatHandler) SendAdviceMessage(ctx context.Context, req *chat.Question)
 	backgroundResponse, err := session.SendMessage(ctx, genai.Text(fmt.Sprintf(
 		`Here's some context about the user's background: 
 		The user is a %s investor with a %s risk tolerance and a %s timeframe.
+		UNDER NO CIRCUMSTANCES should you ask for more information about the user's background.
+		Just give the best possible answer with the data you have.
 		If you understand the user's background and are ready for their question, please response with "ack".`,
 		user.Experience, user.Risk, user.Allocation,
 	)))
@@ -146,7 +135,7 @@ func (s *chatHandler) SendAdviceMessage(ctx context.Context, req *chat.Question)
 		return nil, fmt.Errorf("Unexpected response type")
 	}
 
-	if strings.Contains(string(backgroundResponseText), "ack") {
+	if !strings.Contains(string(backgroundResponseText), "ack") {
 		log.Printf("Chatbot failed to understand the user's background: %v", wakeupResponse.Candidates[0].Content.Parts[0].(genai.Text))
 		return nil, fmt.Errorf("Chatbot failed to understand the user's background")
 	}

@@ -21,6 +21,7 @@
   "paths": {
     "/users/{userId}/watchlist": {
       "get": {
+        "summary": "Get a watchlist by id for a user",
         "operationId": "WatchlistService_GetWatchlist",
         "responses": {
           "200": {
@@ -56,6 +57,7 @@
         ]
       },
       "post": {
+        "summary": "Create a new watchlist",
         "operationId": "WatchlistService_CreateWatchlist",
         "responses": {
           "200": {
@@ -108,6 +110,7 @@
         ]
       },
       "put": {
+        "summary": "Update a user's watchlist",
         "operationId": "WatchlistService_UpdateWatchlist",
         "responses": {
           "200": {
