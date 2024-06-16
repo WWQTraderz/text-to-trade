@@ -1,0 +1,56 @@
+syntax = "proto3";
+package watchlist;
+option go_package = "github.com/tjons/text-to-trade/pkg/api/watchlist";
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+message Watchlist {
+    uint32 id = 1;
+    string name = 2;
+    repeated string symbols = 3;
+    uint32 user_id = 4;
+}
+
+message WatchlistRequest {
+    string id = 1;
+    uint32 user_id = 2;
+}
+
+message WatchlistResponse {
+    Watchlist watchlist = 1;
+}
+
+message WatchlistListResponse {
+    repeated Watchlist watchlists = 1;
+}
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    info: {
+        version: "1.0";
+    };
+    schemes: HTTP;
+};
+service WatchlistService {
+    rpc GetWatchlist(WatchlistRequest) returns (WatchlistResponse) {
+        option (google.api.http) = {
+            get: "/users/{user_id}/watchlist"
+            response_body: "watchlist"
+        };
+    };
+    rpc ListWatchlists(WatchlistRequest) returns (WatchlistListResponse);
+    rpc CreateWatchlist(Watchlist) returns (WatchlistResponse) {
+        option (google.api.http) = {
+            post: "/users/{user_id}/watchlist"
+        };
+    };
+    rpc UpdateWatchlist(Watchlist) returns (WatchlistResponse) {
+        option (google.api.http) = {
+            put: "/users/{user_id}/watchlist"
+        };
+    };
+}
+
+
+
+

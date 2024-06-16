@@ -1,0 +1,19 @@
+version: v2
+plugins:
+  - local: protoc-gen-go
+    out: pkg/api/
+    opt:
+      - paths=source_relative
+  - local: protoc-gen-go-grpc
+    out: pkg/api/
+    opt:
+      - paths=source_relative
+  - local: protoc-gen-grpc-gateway
+    out: pkg/api/
+    opt:
+      - paths=source_relative
+      - generate_unbound_methods=true
+  - local: protoc-gen-openapiv2
+    out: pkg/gen/defs
+inputs:
+  - directory: proto

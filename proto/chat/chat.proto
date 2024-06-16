@@ -1,0 +1,38 @@
+syntax = "proto3";
+package chat;
+
+option go_package = "github.com/tjons/text-to-trade/pkg/api/chat";
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+message Question {
+    string message = 1;
+    uint32 user_id = 2;
+}
+
+message Answer {
+    string message = 1;
+}
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    info: {
+        version: "1.0"
+    };
+    schemes: HTTP
+};
+service Chat {
+  rpc SendMessage (Question) returns (Answer) {
+    option (google.api.http) = {
+      post: "/users/{user_id}/chat"
+      body: "*"
+    };
+  }
+
+  rpc SendAdviceMessage (Question) returns (Answer) {
+    option (google.api.http) = {
+      post: "/users/{user_id}/chat/advice"
+      body: "*"
+    };
+  }
+}

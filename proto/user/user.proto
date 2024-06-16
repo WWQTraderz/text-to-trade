@@ -1,0 +1,81 @@
+syntax = "proto3";
+package user;
+
+option go_package = "github.com/tjons/text-to-trade/pkg/api/user";
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+enum RiskLevel {
+    LOW = 0;
+    HIGH = 1;
+}
+
+enum Allocation {
+    SHORT_TERM = 0;
+    LONG_TERM = 1;
+}
+
+enum ExperienceLevel {
+    BEGINNER = 0;
+    ADVANCED = 1;
+}
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    info: {
+        version: "1.0";
+    };
+    schemes: HTTP;
+};
+message User {
+    uint32 internal_id = 1;
+    string phone_number = 2;
+    string email = 3;
+    string username = 4;
+    ExperienceLevel experience_level = 5;
+    RiskLevel risk_level = 6;
+    Allocation allocation = 7;
+    string firebase_uid = 8;
+}
+
+service UserService {
+    rpc CreateUser(User) returns (User) {
+        option (google.api.http) = {
+            post: "/v1/user/onboard"
+            body: "*"
+        };
+    };
+
+    rpc GetUser(User) returns (User) {
+        option (google.api.http) = {
+            get: "/v1/user/{internal_id}"
+        };
+    };
+
+    rpc OnboardFlow(UserFlowRequest) returns (UserFlowResponse) {
+        option (google.api.http) = {
+            post: "/v1/user/{internal_id}/onboard/flow"
+            body: "*"
+        };
+    };
+}
+
+message UserFlowRequest {
+    uint32 internal_id = 1;
+    Step current_step = 2;
+    string response = 3;
+}
+
+message UserFlowResponse {
+    string message = 1;
+    Step next_step = 2;
+    repeated string options = 3;
+}
+
+enum Step {
+    START = 0;
+    RISK = 1;
+    ALLOCATION = 2;
+    EXPERIENCE = 3;
+    FINISH = 4;
+}

@@ -1,0 +1,302 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "user/user.proto",
+    "version": "1.0"
+  },
+  "tags": [
+    {
+      "name": "UserService"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/user/onboard": {
+      "post": {
+        "operationId": "UserService_CreateUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/userUser"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/userUser"
+            }
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
+    },
+    "/v1/user/onboard/flow": {
+      "post": {
+        "operationId": "UserService_OnboardFlow",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/userUserFlowResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/userUserFlowRequest"
+            }
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
+    },
+    "/v1/user/{internalId}": {
+      "get": {
+        "operationId": "UserService_GetUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/userUser"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "internalId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "phoneNumber",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "email",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "username",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "experienceLevel",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "BEGINNER",
+              "ADVANCED"
+            ],
+            "default": "BEGINNER"
+          },
+          {
+            "name": "riskLevel",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "LOW",
+              "HIGH"
+            ],
+            "default": "LOW"
+          },
+          {
+            "name": "allocation",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "SHORT_TERM",
+              "LONG_TERM"
+            ],
+            "default": "SHORT_TERM"
+          },
+          {
+            "name": "firebaseUid",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "userAllocation": {
+      "type": "string",
+      "enum": [
+        "SHORT_TERM",
+        "LONG_TERM"
+      ],
+      "default": "SHORT_TERM"
+    },
+    "userExperienceLevel": {
+      "type": "string",
+      "enum": [
+        "BEGINNER",
+        "ADVANCED"
+      ],
+      "default": "BEGINNER"
+    },
+    "userRiskLevel": {
+      "type": "string",
+      "enum": [
+        "LOW",
+        "HIGH"
+      ],
+      "default": "LOW"
+    },
+    "userStep": {
+      "type": "string",
+      "enum": [
+        "START",
+        "RISK",
+        "ALLOCATION",
+        "EXPERIENCE",
+        "FINISH"
+      ],
+      "default": "START"
+    },
+    "userUser": {
+      "type": "object",
+      "properties": {
+        "internalId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "phoneNumber": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "experienceLevel": {
+          "$ref": "#/definitions/userExperienceLevel"
+        },
+        "riskLevel": {
+          "$ref": "#/definitions/userRiskLevel"
+        },
+        "allocation": {
+          "$ref": "#/definitions/userAllocation"
+        },
+        "firebaseUid": {
+          "type": "string"
+        }
+      }
+    },
+    "userUserFlowRequest": {
+      "type": "object",
+      "properties": {
+        "internalId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "currentStep": {
+          "$ref": "#/definitions/userStep"
+        },
+        "response": {
+          "type": "string"
+        }
+      }
+    },
+    "userUserFlowResponse": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "nextStep": {
+          "$ref": "#/definitions/userStep"
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
